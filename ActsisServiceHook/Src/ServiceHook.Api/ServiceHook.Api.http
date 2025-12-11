@@ -1,0 +1,6 @@
+@ServiceHook.Api_HostAddress = http://localhost:5013
+
+GET {{ServiceHook.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

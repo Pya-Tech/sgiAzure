@@ -1,0 +1,75 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - SyncSgiAzureWorker/**
+    exclude:
+      - README.md
+      - Tests/**
+      
+variables:
+  DOCKER_REGISTRY: 'DockerActsis'
+  IMAGE_NAME: 'artifacts.actsis.com/actsis/syncsgiazureworker'
+  IMAGE_TAG: '$(Build.BuildId)'
+  CONTAINER_NAME: 'syncSgiAzureWorker'
+  DOCKER_NETWORK: 'sgi_azure_network'
+
+stages:
+- stage: Build
+  displayName: Build and Push Stage
+  jobs:
+  - job: Build
+    displayName: Build Job
+    pool:
+      name: 'Ubuntu'
+      demands:
+        - Agent.Name -equals Ubuntu
+
+    steps:
+    - task: GetRevision@1
+      displayName: "Get Revision"
+      inputs:
+        VariableName: 'Revision'
+
+    - task: Docker@2
+      displayName: "Build and Push Docker Image (ARM64)"
+      inputs:
+        containerRegistry: $(DOCKER_REGISTRY)
+        repository: 'actsis/SyncSgiAzureWorker'
+        dockerfile: SyncSgiAzureWorker/Dockerfile
+        buildContext: SyncSgiAzureWorker
+        command: 'build'
+        tags: |
+          $(Revision)
+          $(IMAGE_TAG)
+          latest
+
+    - task: Docker@2
+      displayName: Push the latest image
+      inputs:
+        containerRegistry: 'DockerActsis'
+        repository: 'actsis/SyncSgiAzureWorker'
+        command: 'push'
+        tags: |
+          $(Revision)
+          latest
+
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+  - job: DeployToVMACT05
+    pool: Ubuntu
+    steps:
+    - task: SSH@0
+      displayName: "Deploy API Container to OCI"
+      inputs:
+        sshEndpoint: 'vmact05'
+        runOptions: 'inline'
+        inline: |
+          docker pull $(IMAGE_NAME):latest
+          docker stop $(CONTAINER_NAME) || true
+          docker rm $(CONTAINER_NAME) || true
+          docker run -d --name $(CONTAINER_NAME) \
+            $(IMAGE_NAME):latest

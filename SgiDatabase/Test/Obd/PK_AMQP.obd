@@ -1,0 +1,111 @@
+-- --------------------------------------------------------------------------------------------------------------------------------
+-- Paquete para manejo de AMQP en Oracle Database
+-- ACTSIS Ltda.
+-- v.1.0 2024-10-08 pablo.serrano: Se crea el paquete PK_AMQP para facilitar la interacción con el protocolo AMQP
+-- --------------------------------------------------------------------------------------------------------------------------------
+--
+-- Descripción:
+-- PK_AMQP proporciona una interfaz para interactuar con brokers de mensajería AMQP en una base de datos Oracle.
+-- Este paquete permite declarar intercambios (exchanges) y enviar mensajes a través del protocolo AMQP, además de
+-- obtener y visualizar configuraciones específicas de cada broker registrado en el sistema.
+--
+-- Historia:
+-- --------------------------------------------------------------------------------------------------------------------------------
+-- v.1.0 2024-10-08 pablo.serrano: Creación inicial con funciones de declaración de intercambio, publicación de mensajes,
+--                           impresión de configuración y prueba de conectividad.
+-- --------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE PACKAGE PK_AMQP AS
+
+  -- Funciones
+
+  FUNCTION F_obtener_broker(
+    user IN VARCHAR2,
+    password IN VARCHAR2
+  ) RETURN NUMBER;                    -- Retorna Identificador del Broker Funcional
+  
+  FUNCTION amqp_exchange_declare(
+    brokerId IN NUMBER,               -- ID del broker para conexión
+    exchange IN VARCHAR2,             -- Nombre del intercambio
+    exchange_type IN VARCHAR2         -- Tipo de intercambio (direct, fanout, topic, headers)
+  ) RETURN NUMBER;                    -- Retorna un código de estado (0: éxito, otro: error)
+
+  FUNCTION amqp_publish(
+    brokerId IN NUMBER,               -- ID del broker para conexión
+    exchange IN VARCHAR2,             -- Nombre del intercambio
+    routingKey IN VARCHAR2,           -- Clave de enrutamiento del mensaje
+    message IN VARCHAR2               -- Cuerpo del mensaje a enviar
+  ) RETURN NUMBER;                    -- Retorna un código de estado (0: éxito, otro: error)
+
+  -- Procedimientos
+  PROCEDURE amqp_print_configuration(
+    brokerId IN NUMBER                -- ID del broker para mostrar configuración
+  );
+
+  PROCEDURE amqp_probe_servers(
+    brokerId IN NUMBER                -- ID del broker para probar conexión con servidores AMQP
+  );
+
+END PK_AMQP;
+/
+
+-- --------------------------------------------------------------------------------------------------------------------------------
+-- Implementación del Paquete PK_AMQP
+-- --------------------------------------------------------------------------------------------------------------------------------
+
+CREATE OR REPLACE PACKAGE BODY PK_AMQP AS
+
+  FUNCTION F_obtener_broker(
+    user IN VARCHAR2,
+    password IN VARCHAR2
+  ) RETURN NUMBER IS
+    vl_broker_id broker.broker_id%TYPE;
+  BEGIN
+    SELECT broker_id 
+    INTO vl_broker_id 
+    FROM broker 
+    WHERE username = user 
+      AND password = password;
+    RETURN vl_broker_id;
+
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      DBMS_OUTPUT.put_line('No se encontró el broker con las credenciales proporcionadas.');
+      RETURN NULL; -- O retorna un valor de error apropiado
+
+    WHEN OTHERS THEN
+      DBMS_OUTPUT.put_line('Ocurrió un error inesperado: ' || SQLERRM);
+      RETURN NULL; -- O retorna un valor de error apropiado
+  END F_obtener_broker;
+
+  FUNCTION amqp_exchange_declare(
+    brokerId IN NUMBER,
+    exchange IN VARCHAR2,
+    exchange_type IN VARCHAR2
+  ) RETURN NUMBER AS
+  LANGUAGE JAVA
+  NAME 'com.zenika.oracle.amqp.RabbitMQPublisher.amqpExchangeDeclare(int, java.lang.String, java.lang.String) return int';
+
+  FUNCTION amqp_publish(
+    brokerId IN NUMBER,
+    exchange IN VARCHAR2,
+    routingKey IN VARCHAR2,
+    message IN VARCHAR2
+  ) RETURN NUMBER AS
+  LANGUAGE JAVA
+  NAME 'com.zenika.oracle.amqp.RabbitMQPublisher.amqpPublish(int, java.lang.String, java.lang.String, java.lang.String) return int';
+
+  PROCEDURE amqp_print_configuration(
+    brokerId IN NUMBER
+  ) AS
+  LANGUAGE JAVA
+  NAME 'com.zenika.oracle.amqp.RabbitMQPublisher.amqpPrintFullConfiguration(int)';
+
+  PROCEDURE amqp_probe_servers(
+    brokerId IN NUMBER
+  ) AS
+  LANGUAGE JAVA
+  NAME 'com.zenika.oracle.amqp.RabbitMQPublisher.amqpProbeAllServers(int)';
+
+END PK_AMQP;
+/

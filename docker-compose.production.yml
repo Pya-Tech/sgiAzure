@@ -1,0 +1,45 @@
+services:
+
+  mysqldb:
+    image: mysql
+    container_name: mysqldb
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - $MYSQL_PORT:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: SGI_AZURE
+    volumes:
+      - 'mysql-data:/var/lib/mysql'
+      - './SgiDatabase/MySql:/docker-entrypoint-initdb.d'
+    networks:
+      - rabbit_test_network
+
+  phpmyadmin:
+    depends_on:
+      - mysqldb
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - $PHPMYADMIN_PORT:80
+    environment:
+      PMA_HOST: $MYSQL_HOST
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+    networks:
+       - rabbit_test_network
+
+volumes:
+  rabbitmq_data:
+  rabbitmq_logs:
+  oracle_data:
+  mysql-data:
+    driver: local
+
+networks:
+  rabbit_test_network:
+    driver: bridge

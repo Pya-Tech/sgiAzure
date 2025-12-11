@@ -1,0 +1,74 @@
+{
+    "vhosts": [
+      {
+        "name": "/"
+      }
+    ],
+    "queues": [
+      {
+        "name": "SgiInsert",
+        "vhost": "/",
+        "durable": true
+      },
+      {
+        "name": "SgiUpdate",
+        "vhost": "/",
+        "durable": true
+      },
+      {
+        "name": "WorkItemInsert",
+        "vhost": "/",
+        "durable": true
+      },
+      {
+        "name": "WorkItemUpdate",
+        "vhost": "/",
+        "durable": true
+      }
+    ],
+    "exchanges": [
+      {
+        "name": "Sgi",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true
+      },
+      {
+        "name": "AzureBoards",
+        "vhost": "/",
+        "type": "direct",
+        "durable": true
+      }
+    ],
+    "bindings": [
+      {
+        "source": "Sgi",
+        "vhost": "/",
+        "destination": "SgiInsert",
+        "destination_type": "queue",
+        "routing_key": "Insert"
+      },
+      {
+        "source": "Sgi",
+        "vhost": "/",
+        "destination": "SgiUpdate",
+        "destination_type": "queue",
+        "routing_key": "Update"
+      },
+      {
+        "source": "AzureBoards",
+        "vhost": "/",
+        "destination": "WorkItemInsert",
+        "destination_type": "queue",
+        "routing_key": "Insert"
+      },
+      {
+        "source": "AzureBoards",
+        "vhost": "/",
+        "destination": "WorkItemUpdate",
+        "destination_type": "queue",
+        "routing_key": "Update"
+      }
+    ]
+  }
+  

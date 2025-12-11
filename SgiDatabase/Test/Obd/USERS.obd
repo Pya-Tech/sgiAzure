@@ -1,0 +1,88 @@
+-- Crear tabla USUARIOS
+create table USUARIOS
+(
+  user_sistema      VARCHAR2(80) not null,
+  cedula            NUMBER(15) not null,
+  nombre            VARCHAR2(500) not null,
+  zona              NUMBER(2),
+  impresora         VARCHAR2(99),
+  estado            VARCHAR2(1) not null,
+  sesiones          NUMBER(2),
+  mail              VARCHAR2(150),
+  impresora_aux     VARCHAR2(99),
+  telefono_celular  NUMBER(10),
+  user_jefe         VARCHAR2(80),
+  expedicion_cedula VARCHAR2(50),
+  password          VARCHAR2(200),
+  tipo              VARCHAR2(1),
+  fecha_desactiva   DATE,
+  foto              BLOB,
+  oficina           VARCHAR2(20) not null,
+  cargo             VARCHAR2(20),
+  dependencia       VARCHAR2(10),
+  extension         NUMBER(8),
+  fecha_creacion    DATE,
+  -- Definir clave primaria
+  constraint PK_USUARIOS PRIMARY KEY (cedula)
+);
+
+-- Agregar comentarios a la tabla
+comment on table USUARIOS
+  is 'Tabla para el registro de los usuarios del sistema';
+
+-- Agregar comentarios a las columnas
+comment on column USUARIOS.user_sistema
+  is 'Usuario de Oracle';
+comment on column USUARIOS.cedula
+  is 'Cédula del usuario del sistema';
+comment on column USUARIOS.nombre
+  is 'Nombre del usuario';
+comment on column USUARIOS.zona
+  is 'Zona a la que pertenece el usuario [ZONAS]';
+comment on column USUARIOS.impresora
+  is 'Path impresora principal';
+comment on column USUARIOS.estado
+  is 'Estado del usuario (S-Activo/N-No Activo)';
+comment on column USUARIOS.sesiones
+  is 'Cantidad máxima de sesiones permitidas por usuario';
+comment on column USUARIOS.mail
+  is 'Correo electrónico del usuario';
+comment on column USUARIOS.impresora_aux
+  is 'Path impresora auxiliar';
+comment on column USUARIOS.telefono_celular
+  is 'Número del teléfono celular';
+comment on column USUARIOS.user_jefe
+  is 'Usuario Jefe [V_USUAR.]';
+comment on column USUARIOS.expedicion_cedula
+  is 'Municipio o Ciudad de expedición de la cédula del usuario';
+comment on column USUARIOS.password
+  is 'Constraseña encriptada del usuario.';
+comment on column USUARIOS.tipo
+  is 'Tipo de Usuario (B: Base de Datos - A: Aplicación - D: Directorio Activo)';
+comment on column USUARIOS.fecha_desactiva
+  is 'Fecha de desactivación de un usuario';
+comment on column USUARIOS.foto
+  is 'Foto del usuario';
+comment on column USUARIOS.oficina
+  is 'Oficina a la que pertenece el usuario [OFICINAS]';
+comment on column USUARIOS.cargo
+  is 'Cargo asignado al usuario. [CARGOS]';
+comment on column USUARIOS.dependencia
+  is 'Dependencia del usuario. [DEPEN]';
+comment on column USUARIOS.extension
+  is 'Número de la extensión para el número telefónico';
+comment on column USUARIOS.fecha_creacion
+  is 'Fecha de creación del usuario';
+
+-- Crear/Recrear las restricciones de clave foránea y únicas (si es necesario)
+-- Ejemplo de restricción de clave foránea (si aplica):
+-- alter table USUARIOS add constraint FK_USUARIOS_ZONA foreign key (zona) references ZONAS(zona_id);
+
+-- Crear/Recrear restricciones de comprobación
+alter table USUARIOS
+  add constraint C_USR_ESTADO_CK
+  check (ESTADO IN ('S', 'N'));
+
+alter table USUARIOS
+  add constraint C_USR_TIPO_CK
+  check (TIPO IN ('A', 'B', 'D'));

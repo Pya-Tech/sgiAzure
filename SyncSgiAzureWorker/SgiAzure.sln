@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SgiAzure.Worker", "Src\SgiAzure.Worker\SgiAzure.Worker.csproj", "{7470F88C-1756-43F7-A7D0-E27C13C3DD5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SgiAzure.Domain", "Src\SgiAzure.Domain\SgiAzure.Domain.csproj", "{69E4C03A-CD37-4004-BD30-80BCC9513398}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SgiAzure.Application", "Src\SgiAzure.Application\SgiAzure.Application.csproj", "{EEE45240-D6B3-4F0B-BA65-C3B388A4EFAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SgiAzure.Infrastructure", "Src\SgiAzure.Infrastructure\SgiAzure.Infrastructure.csproj", "{32A1A5FB-12BB-4BDA-B6BC-425FCE319F71}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9A6DABD8-F120-4834-BD60-981D622CD0F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SgiAzure.Application.Tests", "Tests\SgiAzure.Application.Tests\SgiAzure.Application.Tests.csproj", "{A0E557C2-09B5-49C4-ABC7-8851078521D0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7470F88C-1756-43F7-A7D0-E27C13C3DD5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7470F88C-1756-43F7-A7D0-E27C13C3DD5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7470F88C-1756-43F7-A7D0-E27C13C3DD5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7470F88C-1756-43F7-A7D0-E27C13C3DD5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69E4C03A-CD37-4004-BD30-80BCC9513398}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69E4C03A-CD37-4004-BD30-80BCC9513398}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69E4C03A-CD37-4004-BD30-80BCC9513398}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69E4C03A-CD37-4004-BD30-80BCC9513398}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEE45240-D6B3-4F0B-BA65-C3B388A4EFAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEE45240-D6B3-4F0B-BA65-C3B388A4EFAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEE45240-D6B3-4F0B-BA65-C3B388A4EFAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEE45240-D6B3-4F0B-BA65-C3B388A4EFAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32A1A5FB-12BB-4BDA-B6BC-425FCE319F71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32A1A5FB-12BB-4BDA-B6BC-425FCE319F71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32A1A5FB-12BB-4BDA-B6BC-425FCE319F71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32A1A5FB-12BB-4BDA-B6BC-425FCE319F71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0E557C2-09B5-49C4-ABC7-8851078521D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0E557C2-09B5-49C4-ABC7-8851078521D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0E557C2-09B5-49C4-ABC7-8851078521D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0E557C2-09B5-49C4-ABC7-8851078521D0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A0E557C2-09B5-49C4-ABC7-8851078521D0} = {9A6DABD8-F120-4834-BD60-981D622CD0F0}
+	EndGlobalSection
+EndGlobal

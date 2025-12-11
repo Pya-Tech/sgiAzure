@@ -1,0 +1,55 @@
+# Ignore Visual Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.userprefs
+*.ntvs*
+*.njsproj
+*.sln.docstates
+*.sln.ide
+*.sln.ide-shm
+*.sln.ide-wal
+
+# Ignore Visual Studio Code files
+.vscode/
+
+# Ignore build output
+bin/
+obj/
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+
+# Ignore .NET Core and .NET 8 specific files
+*.dll
+*.exe
+*.pdb
+*.log
+*.cache
+*.db
+*.sqlite
+appsettings.Development.json
+**/net8.0/
+**/packages/
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+
+# Ignore NuGet packages
+*.nuget.props
+*.lock.json
+*.paket.repos
+**/packages/
+packages/
+
+# Ignore environment files
+.env
+
+# Ignore generated files by IDEs
+.idea/
+
+# Project-specific ignores
+/SyncSgiAzureWorker/.idea

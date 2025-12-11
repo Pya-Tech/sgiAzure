@@ -1,0 +1,95 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - ActsisServiceHook/**
+    exclude:
+      - README.md
+      
+variables:
+  DOCKER_REGISTRY: 'DockerActsis'
+  IMAGE_NAME: 'artifacts.actsis.com/actsis/actsisservicehook'
+  IMAGE_TAG: '$(Build.BuildId)'
+  CONTAINER_NAME: 'actsisServiceHook'
+  TARGET_PORT: '4400:8080'
+
+  RABBITMQ__HOST: '192.168.25.210'
+  RABBITMQ__PORT: '5672'
+  RABBITMQ__CREDENTIALS__USERNAME: 'admin'
+  RABBITMQ__CREDENTIALS__PASSWORD: 'N9v!rT6zQ4#xP2kD'
+  RABBITMQ__MAXRETRYATTEMPS: '3'
+  ASPNETCORE_ENVIRONMENT: 'Production'
+
+stages:
+- stage: Build
+  displayName: Build and Push Stage
+  jobs:
+  - job: Build
+    displayName: Build Job
+    pool:
+      name: 'Ubuntu'
+      demands:
+        - Agent.Name -equals vmdocker01
+
+    steps:
+    - task: GetRevision@1
+      displayName: "Get Revision"
+      inputs:
+        VariableName: 'Revision'
+
+    - task: Docker@2
+      displayName: "Build and Push Docker Image (ARM64)"
+      inputs:
+        containerRegistry: $(DOCKER_REGISTRY)
+        repository: 'actsis/ActsisServiceHook'
+        dockerfile: ActsisServiceHook/Dockerfile
+        buildContext: ActsisServiceHook
+        command: 'build'
+        tags: |
+          $(Revision)
+          $(IMAGE_TAG)
+          latest
+        arguments: >
+          --build-arg ASPNETCORE_ENVIRONMENT=$(ASPNETCORE_ENVIRONMENT)
+          --build-arg RABBITMQ__HOST=$(RABBITMQ__HOST)
+          --build-arg RABBITMQ__PORT=$(RABBITMQ__PORT)
+          --build-arg RABBITMQ__CREDENTIALS__USERNAME=$(RABBITMQ__CREDENTIALS__USERNAME)
+          --build-arg RABBITMQ__CREDENTIALS__PASSWORD=$(RABBITMQ__CREDENTIALS__PASSWORD)
+          --build-arg RABBITMQ__MAXRETRYATTEMPS=$(RABBITMQ__MAXRETRYATTEMPS)
+
+    - task: Docker@2
+      displayName: Push the latest image
+      inputs:
+        containerRegistry: 'DockerActsis'
+        repository: 'actsis/ActsisServiceHook'
+        command: 'push'
+        tags: |
+          $(Revision)
+          latest
+
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+  - job: DeployToOCI
+    pool: Ubuntu
+    steps:
+    - task: SSH@0
+      displayName: "Deploy API Container to OCI"
+      inputs:
+        sshEndpoint: 'vmdocker01'
+        runOptions: 'inline'
+        inline: |
+          docker pull $(IMAGE_NAME):latest
+          docker stop $(CONTAINER_NAME) || true
+          docker rm $(CONTAINER_NAME) || true
+          docker run --platform linux/arm64 -d --name $(CONTAINER_NAME) -p $(TARGET_PORT) \
+            --network red-cloudflare \
+            -e ASPNETCORE_ENVIRONMENT=$(ASPNETCORE_ENVIRONMENT) \
+            -e RABBITMQ__HOST=$(RABBITMQ__HOST) \
+            -e RABBITMQ__PORT=$(RABBITMQ__PORT) \
+            -e RABBITMQ__CREDENTIALS__USERNAME=$(RABBITMQ__CREDENTIALS__USERNAME) \
+            -e RABBITMQ__CREDENTIALS__PASSWORD=$(RABBITMQ__CREDENTIALS__PASSWORD) \
+            -e RABBITMQ__MAXRETRYATTEMPS=$(RABBITMQ__MAXRETRYATTEMPS) \
+            $(IMAGE_NAME):latest

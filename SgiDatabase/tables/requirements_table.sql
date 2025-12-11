@@ -1,0 +1,190 @@
+CREATE SEQUENCE seq_requerimientos
+  START WITH 1
+  INCREMENT BY 1
+  CACHE 20;
+
+CREATE TABLE REQUERIMIENTOS
+(
+  numero_requerimiento      NUMBER(8) NOT NULL,
+  estado                    VARCHAR2(1) NOT NULL,
+  user_reporta              VARCHAR2(20) NOT NULL,
+  fecha_reporta             DATE NOT NULL,
+  comentario_reporta        VARCHAR2(2000) NOT NULL,
+  error                     VARCHAR2(1000),
+  sistema                   VARCHAR2(6) NOT NULL,
+  programa                  VARCHAR2(50),
+  requerimiento_relacionado NUMBER(16),
+  tipo_tramite              VARCHAR2(10),
+  horas_programadas         NUMBER(6,1),
+  fecha_programada          DATE,
+  fecha_ajustada            DATE,
+  user_respuesta            VARCHAR2(20),
+  horas_reales              NUMBER(6,1),
+  tipo_respuesta            VARCHAR2(10),
+  horas_dia                 NUMBER(2),
+  fecha_inicio              DATE,
+  prioridad                 NUMBER(1),
+  satisfaccion              NUMBER(3),
+  sat_tecnica               NUMBER(3),
+  sat_servicio              NUMBER(3),
+  sat_tiempo                NUMBER(3),
+  tipo_reporta              VARCHAR2(3) NOT NULL,
+  empresa                   VARCHAR2(10),
+  proyecto                  VARCHAR2(10),
+  modulo                    VARCHAR2(10),
+  desplazar                 VARCHAR2(1),
+  reprogramar               VARCHAR2(1),
+  prg_festivos              VARCHAR2(1),
+  fecha_programada_ini      DATE,
+  etapa                     VARCHAR2(2),
+  user_programado           VARCHAR2(20),
+  user_responsable          VARCHAR2(20),
+  comentario                VARCHAR2(2000),
+  horas_programadas_ini     NUMBER(6,1),
+  etapa_proyecto            VARCHAR2(5),
+  contrato                  VARCHAR2(20),
+  proyecto_new              VARCHAR2(20),
+  incidente_reporta         VARCHAR2(1) DEFAULT 'N',
+  incidente_respuesta       VARCHAR2(1) DEFAULT 'N',
+  tipo_incidente            NUMBER(2),
+  observacion_incidente     VARCHAR2(2000),
+  id_correccion             VARCHAR2(1),
+  orden                     NUMBER(3),
+  categoria_id              NUMBER(5),
+  categoria_id_tramite      NUMBER(5),
+  fecha_entrega             DATE,
+  fecha_fin                 DATE,
+  horas_adicionales         NUMBER(6,1),
+  impacto                   NUMBER(2),
+  objeto_id                 NUMBER(8),
+  tipo                      VARCHAR2(30),
+  urgencia                  NUMBER(2),
+  vigencia                  NUMBER(4),
+  opcion_id                 NUMBER(8),
+  empresa_codigo            NUMBER(4),
+  fecha_fin_estado          DATE NOT NULL,
+  horas_extras              NUMBER(4,1),
+  sat_com_tecnica           VARCHAR2(666),
+  sat_com_servicio          VARCHAR2(666),
+  sat_com_tiempo            VARCHAR2(666),
+  ppt_tipo                  VARCHAR2(6),
+  area                      VARCHAR2(128),
+  sub_area                  VARCHAR2(128),
+  tipo_req_cliente          VARCHAR2(128),
+  tema                      VARCHAR2(128),
+  is_queue                  NUMBER(1) DEFAULT 0
+);
+
+COMMENT ON TABLE REQUERIMIENTOS
+  IS 'Tabla de registro de Requerimientos';
+
+-- Add comments to the columns
+COMMENT ON COLUMN REQUERIMIENTOS.numero_requerimiento
+  IS 'Número identificador del requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.estado
+  IS 'Estado del requerimiento [ESTRQ]';
+COMMENT ON COLUMN REQUERIMIENTOS.user_reporta
+  IS 'Usuario que reporta/crea el requerimiento [V_USUAR]';
+COMMENT ON COLUMN REQUERIMIENTOS.fecha_reporta
+  IS 'Fecha de reporte del requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.comentario_reporta
+  IS 'Observaciones/síntesis del requerimiento escritas por el usuario que lo reporta';
+COMMENT ON COLUMN REQUERIMIENTOS.error
+  IS 'Descripción del error (si el requerimiento proviene de un error o fallo de programa)';
+COMMENT ON COLUMN REQUERIMIENTOS.sistema
+  IS 'Sistema al cual pertenece el requerimiento [USRSI]';
+COMMENT ON COLUMN REQUERIMIENTOS.programa
+  IS 'Programa relacionado con el requerimiento [V_PROGR]';
+COMMENT ON COLUMN REQUERIMIENTOS.requerimiento_relacionado
+  IS 'Número de requerimiento relacionado con el requerimiento actual';
+COMMENT ON COLUMN REQUERIMIENTOS.tipo_tramite
+  IS 'Tipo de requerimiento según el usuario que lo verifica [TIPRQ]';
+COMMENT ON COLUMN REQUERIMIENTOS.horas_programadas
+  IS 'Horas programadas para el requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.fecha_programada
+  IS 'Fecha de finalización actual para el requerimiento (después de reprogramar)';
+COMMENT ON COLUMN REQUERIMIENTOS.fecha_ajustada
+  IS 'Fecha programada ajustada *** OBSOLETA - DEBE ELIMINARSE ***';
+COMMENT ON COLUMN REQUERIMIENTOS.user_respuesta
+  IS 'Usuario o responsable que da la respuesta final';
+COMMENT ON COLUMN REQUERIMIENTOS.horas_reales
+  IS 'Horas reales o definitivas que tomó la ejecución del requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.tipo_respuesta
+  IS 'Tipo de requerimiento real (según la respuesta definitiva)';
+COMMENT ON COLUMN REQUERIMIENTOS.horas_dia
+  IS 'Número de horas al día programadas para el requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.fecha_inicio
+  IS 'Fecha de inicio del requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.prioridad
+  IS 'Prioridad del requerimiento (1: Máx; 2: Med; 3: Normal)';
+COMMENT ON COLUMN REQUERIMIENTOS.satisfaccion
+  IS 'Detalle de la respuesta final sobre el requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.sat_tecnica
+  IS 'Nivel de Satisfacción sobre la solución y Técnica';
+COMMENT ON COLUMN REQUERIMIENTOS.sat_servicio
+  IS 'Nivel de Satisfacción sobre el servicio o forma de atención';
+COMMENT ON COLUMN REQUERIMIENTOS.sat_tiempo
+  IS 'Nivel de Satisfacción sobre el Tiempo de Respuesta';
+COMMENT ON COLUMN REQUERIMIENTOS.tipo_reporta
+  IS 'Tipo de requerimiento según el usuario que lo reporta [TIPRQ]';
+COMMENT ON COLUMN REQUERIMIENTOS.empresa
+  IS 'Empresa a la cual está asignado el requerimiento [USREM]';
+COMMENT ON COLUMN REQUERIMIENTOS.proyecto
+  IS 'Proyecto asociado al requerimiento [USRPR][EMPRESA]';
+COMMENT ON COLUMN REQUERIMIENTOS.modulo
+  IS 'Módulo del sistema del cual nace el requerimiento [MODRE][SISTEMA]';
+COMMENT ON COLUMN REQUERIMIENTOS.desplazar
+  IS 'Campo que indica si el requerimiento desplaza o no requerimientos (S: El requerimiento desplaza otros requerimientos, N: El requerimiento no desplaza)';
+COMMENT ON COLUMN REQUERIMIENTOS.reprogramar
+  IS 'Campo que indica si el requerimiento va a ser desplazado por reprogramación. (S) se desplaza, (N) no se desplaza';
+COMMENT ON COLUMN REQUERIMIENTOS.prg_festivos
+  IS 'Campo que indica si el requerimiento se programa o no en días festivos (S: Se programan festivos, N: No se programan';
+COMMENT ON COLUMN REQUERIMIENTOS.fecha_programada_ini
+  IS 'Fecha de finalización estimada para el requerimiento (inicial)';
+COMMENT ON COLUMN REQUERIMIENTOS.etapa
+  IS 'Etapa actual de las actividades relacionadas con el requerimiento [ETPRQ]';
+COMMENT ON COLUMN REQUERIMIENTOS.user_programado
+  IS 'Usuario programado para realizar el requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.user_responsable
+  IS 'Usuario o responsable actual del requerimiento (cada etapa puede tener diferentes responsables)';
+COMMENT ON COLUMN REQUERIMIENTOS.comentario
+  IS 'Comentarios versión del documento';
+COMMENT ON COLUMN REQUERIMIENTOS.horas_programadas_ini
+  IS 'Horas iniciales (presupuestadas) programadas para el requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.incidente_reporta
+  IS 'Identificador que determina si el requerimiento se generó por un incidente, según el usuario que reporta.';
+COMMENT ON COLUMN REQUERIMIENTOS.incidente_respuesta
+  IS 'Identificador REAL que determina si el requerimiento se generó por un incidente, según la respuesta definitiva.';
+COMMENT ON COLUMN REQUERIMIENTOS.tipo_incidente
+  IS 'Observación o justificación del incidente.';
+COMMENT ON COLUMN REQUERIMIENTOS.orden
+  IS 'Orden de atención del requerimiento. Es un orden temporal sobre un grupo de requerimientos en trámite';
+COMMENT ON COLUMN REQUERIMIENTOS.empresa_codigo
+  IS 'Código de la empresa que solicita el requerimiento.';
+COMMENT ON COLUMN REQUERIMIENTOS.fecha_fin_estado
+  IS 'Si el desarrollo se implanta o no en la filial (S/N)';
+COMMENT ON COLUMN REQUERIMIENTOS.horas_extras
+  IS 'Número de horas extras al presupuesto inicial';
+COMMENT ON COLUMN REQUERIMIENTOS.sat_com_tecnica
+  IS 'Comentarios sobre la solución técnica en la encuesta de satisfacción';
+COMMENT ON COLUMN REQUERIMIENTOS.sat_com_servicio
+  IS 'Comentarios sobre el servicio brindado en la encuesta de satisfacción';
+COMMENT ON COLUMN REQUERIMIENTOS.sat_com_tiempo
+  IS 'Comentarios sobre el tiempo de respuesta en la encuesta de satisfacción';
+COMMENT ON COLUMN REQUERIMIENTOS.ppt_tipo
+  IS 'Tipo de requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.area
+  IS 'Área donde se realizó el requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.sub_area
+  IS 'Subárea donde se realizó el requerimiento';
+COMMENT ON COLUMN REQUERIMIENTOS.tipo_req_cliente
+  IS 'Tipo de requerimiento en la encuesta de satisfacción';
+COMMENT ON COLUMN REQUERIMIENTOS.tema
+  IS 'Tema del requerimiento';
+alter table REQUERIMIENTOS
+  add check (is_queue IN (0, 1));
+-- Add primary key constraint
+ALTER TABLE REQUERIMIENTOS
+  ADD CONSTRAINT pk_requerimientos PRIMARY KEY (numero_requerimiento);
+
+

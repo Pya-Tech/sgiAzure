@@ -1,0 +1,23 @@
+CREATE USER GEN_BROKER IDENTIFIED BY 1234339827;
+GRANT CONNECT, RESOURCE TO GEN_BROKER;
+
+-- Permisos para ejecutar y cargar Java
+GRANT JAVAUSERPRIV TO GEN_BROKER;
+GRANT EXECUTE ON DBMS_JAVA TO GEN_BROKER;
+GRANT CREATE PROCEDURE TO GEN_BROKER;
+
+GRANT JAVA_ADMIN TO GEN_BROKER;
+GRANT CONNECT TO GEN_BROKER;
+GRANT RESOURCE TO GEN_BROKER;
+
+-- Si necesitas acceso completo a recursos Java (esto es riesgoso, úsalo solo si es necesario)
+GRANT JAVA_ADMIN TO GEN_BROKER;
+
+alter user GEN
+  identified by "1234339827";
+
+alter user SGI
+  identified by "1234339827";
+
+alter user SGI_CNX
+  identified by "1234339827";

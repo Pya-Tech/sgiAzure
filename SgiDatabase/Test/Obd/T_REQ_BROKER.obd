@@ -1,0 +1,78 @@
+CREATE OR REPLACE TRIGGER "T_REQ_BROKER"
+AFTER INSERT OR UPDATE OR DELETE
+ON REQUERIMIENTOS
+REFERENCING NEW AS NEW OLD AS OLD
+FOR EACH ROW
+DECLARE
+  vl_queue VARCHAR2(40);
+  vl_broker_exchange VARCHAR2(40) := PK_ACTSIS.F_Leer_Parametro(vi_parametro => 'GEN_BROKER_EXCHANGE');
+  vl_broker_user VARCHAR2(20) := PK_ACTSIS.F_Leer_Parametro(vi_parametro => 'GEN_BROKER_USUARIO');
+  vl_broker_password VARCHAR2(20) := PK_ACTSIS.F_Leer_Parametro(vi_parametro => 'GEN_BROKER_PASSWORD');
+  vl_broker_id NUMBER := PK_AMQP.F_obtener_broker(user => vl_broker_user, password => vl_broker_password);
+  vl_json_message CLOB;
+  vl_publish_result NUMBER;
+BEGIN
+  --------------------------------------------------------------------------------
+  -- Comunicación con Broker de Mensajería TABLA - REQUERIMIENTOS
+  -- © ACTSIS.2024-08-10.pablo.serrano
+  --------------------------------------------------------------------------------
+  IF (INSERTING OR UPDATING) AND :NEW.is_queue = 1 THEN
+    vl_json_message := JSON_OBJECT(
+      'numero_requerimiento' VALUE :NEW.numero_requerimiento,
+      'estado' VALUE :NEW.estado,
+      'user_reporta' VALUE :NEW.user_reporta,
+      'fecha_reporta' VALUE TO_CHAR(:NEW.fecha_reporta, 'YYYY-MM-DD"T"HH24:MI:SS'),
+      'comentario_reporta' VALUE :NEW.comentario_reporta,
+      'sistema' VALUE :NEW.sistema,
+      'tipo_tramite' VALUE :NEW.tipo_tramite,
+      'horas_programadas' VALUE :NEW.horas_programadas,
+      'fecha_programada' VALUE TO_CHAR(:NEW.fecha_programada, 'YYYY-MM-DD"T"HH24:MI:SS'),
+      'user_respuesta' VALUE :NEW.user_respuesta,
+      'horas_reales' VALUE :NEW.horas_reales,
+      'tipo_respuesta' VALUE :NEW.tipo_respuesta,
+      'prioridad' VALUE :NEW.prioridad,
+      'satisfaccion' VALUE :NEW.satisfaccion,
+      'sat_tecnica' VALUE :NEW.sat_tecnica,
+      'sat_servicio' VALUE :NEW.sat_servicio,
+      'sat_tiempo' VALUE :NEW.sat_tiempo,
+      'tipo_reporta' VALUE :NEW.tipo_reporta,
+      'empresa' VALUE :NEW.empresa,
+      'proyecto' VALUE :NEW.proyecto,
+      'modulo' VALUE :NEW.modulo,
+      'fecha_programada_ini' VALUE TO_CHAR(:NEW.fecha_programada_ini, 'YYYY-MM-DD"T"HH24:MI:SS'),
+      'user_programado' VALUE :NEW.user_programado,
+      'user_responsable' VALUE :NEW.user_responsable,
+      'fecha_fin_estado' VALUE TO_CHAR(:NEW.fecha_fin_estado, 'YYYY-MM-DD"T"HH24:MI:SS'),
+      'horas_extras' VALUE :NEW.horas_extras,      
+      'area' VALUE :NEW.area,
+      'sub_area' VALUE :NEW.sub_area,
+      'tema' VALUE :NEW.tema
+    );
+
+    IF INSERTING THEN
+      vl_queue := 'GEN_BROKER_INSERT_QUEUE';
+    ELSIF UPDATING THEN
+      vl_queue := 'GEN_BROKER_UPDATE_QUEUE';
+    END IF;
+    
+    vl_publish_result := PK_AMQP.amqp_publish(
+      brokerId => vl_broker_id,
+      exchange => vl_broker_exchange,
+      routingKey => PK_ACTSIS.F_Leer_Parametro(vi_parametro => vl_queue),
+      message => vl_json_message
+    );
+
+    IF vl_publish_result != 0 THEN
+      RAISE_APPLICATION_ERROR(
+        num => -20001,
+        msg => 'Error al publicar el mensaje en la cola. Código de error: ' || vl_publish_result
+      );
+    END IF;
+
+  ELSIF DELETING THEN
+    vl_queue := 'GEN_BROKER_DELETE_QUEUE';
+    -- Lógica de publicación en caso de eliminación, si es necesario
+    -- vl_publish_result := PK_AMQP.amqp_publish(...);
+  END IF;
+
+END T_REQ_BROKER;
